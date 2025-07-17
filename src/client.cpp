@@ -26,11 +26,16 @@ void Client::sendDatagram()
 {
     try
     {
+        /* Init socket data */
         QByteArray data = data_pte->toPlainText().toUtf8();
         QHostAddress address(address_le->text());
         quint16 port = port_le->text().toInt();
         QUdpSocket *socket = new QUdpSocket;
+
+        /* Send dtg */
         socket->writeDatagram(data, address, port);
+
+        /* Delate socket */
         socket->deleteLater();
     }
     catch(...)

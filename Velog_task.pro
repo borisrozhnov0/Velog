@@ -1,4 +1,5 @@
-QT       += core gui network
+QT_MAJOR_VERSION = 5
+QT += core gui network quick qml quickcontrols2 quickwidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 

@@ -9,6 +9,7 @@
 #include <QUdpSocket>
 #include <QByteArray>
 
+
 namespace Ui {
 class Client;
 }
@@ -29,6 +30,7 @@ private:
     QPushButton *send_bt;
     QLineEdit *address_le, *port_le;
     QPlainTextEdit *data_pte;
+
 };
 
 #endif // CLIENT_H

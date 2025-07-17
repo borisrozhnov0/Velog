@@ -5,7 +5,13 @@
 #include <QLabel>
 #include <QUdpSocket>
 #include <QNetworkDatagram>
-
+#include <QNetworkInterface>
+#include <QString>
+#include <QQuickWidget>
+#include <QQmlContext>
+#include <QQmlComponent>
+#include <QQmlEngine>
+#include <QQuickItem>
 
 namespace Ui {
 class Server;
@@ -24,11 +30,11 @@ private slots:
 
 private:
     void initSocket(quint16 port);
-
+    QString getIpAddress();
     Ui::Server *ui;
-    QLabel *addres_lb, *port_lb;
+    QLabel *address_lb, *port_lb;
     QUdpSocket * upd_socket;
-
+    QQuickWidget* container = nullptr;
 };
 
 

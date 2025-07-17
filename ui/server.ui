@@ -14,36 +14,20 @@
    <string>Server</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QFrame" name="frame">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>631</width>
-      <height>541</height>
-     </rect>
-    </property>
-    <property name="frameShape">
-     <enum>QFrame::Shape::StyledPanel</enum>
-    </property>
-    <property name="frameShadow">
-     <enum>QFrame::Shadow::Raised</enum>
-    </property>
-   </widget>
    <widget class="QWidget" name="verticalLayoutWidget">
     <property name="geometry">
      <rect>
       <x>650</x>
       <y>10</y>
       <width>131</width>
-      <height>81</height>
+      <height>84</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>Addres</string>
+        <string>Address:</string>
        </property>
       </widget>
      </item>
@@ -57,7 +41,7 @@
      <item>
       <widget class="QLabel" name="label_3">
        <property name="text">
-        <string>Port</string>
+        <string>Port:</string>
        </property>
       </widget>
      </item>
