@@ -27,14 +27,18 @@ public:
 
 private slots:
     void readDatagram();
+    void sendRequest();
 
 private:
-    void initSocket(quint16 port);
     QString getIpAddress();
+    void initQML();
+
     Ui::Server *ui;
+    quint16 port;
     QLabel *address_lb, *port_lb;
-    QUdpSocket * upd_socket;
+    QUdpSocket *udp_socket;
     QQuickWidget* container = nullptr;
+    QString str_ip;
 };
 
 

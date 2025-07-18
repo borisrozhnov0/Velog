@@ -4,10 +4,13 @@
 #include <QMainWindow>
 #include <QPushButton>
 #include <QPlainTextEdit>
-#include <QLineEdit>
+#include <QLabel>
 #include <QPushButton>
 #include <QUdpSocket>
 #include <QByteArray>
+#include <QFileDialog>
+#include <QNetworkDatagram>
+#include <QNetworkInterface>
 
 
 namespace Ui {
@@ -19,17 +22,24 @@ class Client : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit Client(QWidget *parent = nullptr);
+    explicit Client(quint16 _port = 2222, QWidget *parent = nullptr);
     ~Client();
 
 private slots:
     void sendDatagram();
+    void saveFile();
+    void loadFile();
 
 private:
     Ui::Client *ui;
+    quint16 port;
+    QUdpSocket * udp_socket;
+    QString getIpAddress();
+    QString str_ip, str_port;
     QPushButton *send_bt;
-    QLineEdit *address_le, *port_le;
+    QLabel *address_le, *port_le;
     QPlainTextEdit *data_pte;
+
 
 };
 

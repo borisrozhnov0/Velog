@@ -4,70 +4,71 @@
 Server::Server(quint16 _port, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::Server)
+    , port{_port}
 {
     ui->setupUi(this);
+    str_ip = getIpAddress();
 
-    /* UI accesse */
-    address_lb = ui->label_addres,
-    port_lb = ui->label_port;
 
-    /* init */
-    initSocket(_port);
+    /* init upd_socket*/
+    udp_socket = new QUdpSocket(this);
+    udp_socket->bind(QHostAddress(str_ip), port);
 
     /* connections */
-    connect(upd_socket, &QUdpSocket::readyRead, this, &Server::readDatagram);
-
-}
-
-void Server::initSocket(quint16 port)
-{
-    upd_socket = new QUdpSocket(this);
-    try
-    {
-        QHostAddress local_host = QHostAddress(getIpAddress());
-        upd_socket->bind(local_host, port);
-        address_lb->setText(local_host.toString());
-        port_lb->setText(QString::number(port));
-    }
-    catch(...)
-    {
-        qDebug() << "Error";
-    }
+    connect(udp_socket,       &QUdpSocket::readyRead, this, &Server::readDatagram);
+    connect(ui->get_button,   &QPushButton::clicked,  this, &Server::sendRequest);
+    connect(ui->strat_button, &QPushButton::clicked,  this, &Server::initQML);
 }
 
 QString Server::getIpAddress()
 {
-    const QHostAddress &localhost = QHostAddress(QHostAddress::LocalHost);
+   QHostAddress localhost = QHostAddress(QHostAddress::LocalHost);
     for (const QHostAddress &address: QNetworkInterface::allAddresses()) {
         if (address.protocol() == QAbstractSocket::IPv4Protocol && address != localhost)
             return address.toString();
     }
-    return "Unknown";
+    return localhost.toString();
+}
+
+void Server::sendRequest()
+{
+    QByteArray data;
+    udp_socket->writeDatagram(data,
+                              QHostAddress(ui->line_ip_address->text()),
+                              static_cast<quint16>(ui->line_port->text().toUInt()));
 }
 
 
 void Server::readDatagram()
 {
-    while(upd_socket->hasPendingDatagrams()){
-        QNetworkDatagram datagram = upd_socket->receiveDatagram();
+    while(udp_socket->hasPendingDatagrams()){
+        QNetworkDatagram datagram = udp_socket->receiveDatagram();
 
-        if(!container){
-            container = new QQuickWidget(this);
-            container->setResizeMode(QQuickWidget::SizeViewToRootObject);
-        }
-        else {
-            if(container->rootObject()) container->rootObject()->deleteLater();
-        }
-        QQmlComponent component(container->engine());
-        component.setData(datagram.data(), QUrl());
-
-        if(component.isError()) {
-            qWarning() << "QML Error:" << component.errors();
+        if(datagram.senderAddress() != QHostAddress(ui->line_ip_address->text()) || datagram.senderPort() != static_cast<quint16>(ui->line_port->text().toUInt())){
             continue;
         }
-        container->setContent(component.url(), &component, static_cast<QQuickItem*>(component.create()));
-        container->show();
+        ui->text_data->setPlainText(QString::fromUtf8(datagram.data()));
     }
+}
+
+void Server::initQML()
+{
+    if(container){
+        if(container->rootObject()) container->rootObject()->deleteLater();
+        container->deleteLater();
+    }
+    container = new QQuickWidget(ui->widget);
+    container->setResizeMode(QQuickWidget::SizeViewToRootObject);
+
+    QQmlComponent component(container->engine());
+    component.setData(QByteArray(ui->text_data->toPlainText().toUtf8()), QUrl());
+
+    if(component.isError()) {
+        qWarning() << "QML Error:" << component.errors();
+        return;
+    }
+    container->setContent(component.url(), &component, static_cast<QQuickItem*>(component.create()));
+    container->show();
 }
 
 Server::~Server()
