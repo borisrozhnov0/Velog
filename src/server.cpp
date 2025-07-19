@@ -9,8 +9,7 @@ Server::Server(quint16 _port, QWidget *parent)
     ui->setupUi(this);
     str_ip = getIpAddress();
 
-
-    /* init upd_socket*/
+    /* init UdpSocket*/
     udp_socket = new QUdpSocket(this);
     udp_socket->bind(QHostAddress(str_ip), port);
 
@@ -20,6 +19,10 @@ Server::Server(quint16 _port, QWidget *parent)
     connect(ui->strat_button, &QPushButton::clicked,  this, &Server::initQML);
 }
 
+/** *
+ *  @brief get corret IpAddress
+ *  @return correct IP address or localhost
+ */
 QString Server::getIpAddress()
 {
    QHostAddress localhost = QHostAddress(QHostAddress::LocalHost);
@@ -30,6 +33,10 @@ QString Server::getIpAddress()
     return localhost.toString();
 }
 
+/** *
+ *  @brief get QML Data from client
+ *  Send empty Udp request on IP:Port from UI
+ */
 void Server::sendRequest()
 {
     QByteArray data;
@@ -38,7 +45,11 @@ void Server::sendRequest()
                               static_cast<quint16>(ui->line_port->text().toUInt()));
 }
 
-
+/** *
+ *  @brief Listen Udp socket and response to PlainText
+ *  Listen Udp socket and response to PlainText, if ip or port don't match
+ *  to a ui data, then ignore it otherwise add to PlainText
+ */
 void Server::readDatagram()
 {
     while(udp_socket->hasPendingDatagrams()){
@@ -51,15 +62,23 @@ void Server::readDatagram()
     }
 }
 
+/** *
+ *  @brief Start QML code from PlainText
+ *  Start QML code from PlainText, if QQuickWidget already using delete it
+ *  and create new QQickWidget
+ */
 void Server::initQML()
 {
+    // if QQuickWidget already using delete it
     if(container){
         if(container->rootObject()) container->rootObject()->deleteLater();
         container->deleteLater();
     }
+    // create new QQuickWidget
     container = new QQuickWidget(ui->widget);
     container->setResizeMode(QQuickWidget::SizeViewToRootObject);
 
+    // create QQmlComponent form PlainText source
     QQmlComponent component(container->engine());
     component.setData(QByteArray(ui->text_data->toPlainText().toUtf8()), QUrl());
 
@@ -67,6 +86,7 @@ void Server::initQML()
         qWarning() << "QML Error:" << component.errors();
         return;
     }
+    // start QML code
     container->setContent(component.url(), &component, static_cast<QQuickItem*>(component.create()));
     container->show();
 }
