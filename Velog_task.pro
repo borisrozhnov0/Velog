@@ -27,3 +27,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 FORMS += \
     ui/client.ui \
     ui/server.ui
+
+DESTDIR = $${PWD}/bin
+TARGET = velog_test
